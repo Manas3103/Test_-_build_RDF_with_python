@@ -10,7 +10,7 @@ class AnalysisSkimmer:
         self.output_branches = []
         print(f"Initialized RDataFrame with tree '{tree_name}'")
 
-    def apply_multiple_triggers(self, trigger_list: List[str], MET_Filter: List[str]):
+    def apply_multiple_triggers(self, trigger_list: List[str] = None, MET_Filter: List[str] = None):
         """
         Filters events if ANY of the triggers in the list fired.
         """
