@@ -10,30 +10,20 @@ class AnalysisSkimmer:
         self.output_branches = []
         print(f"Initialized RDataFrame with tree '{tree_name}'")
 
-    def apply_multiple_triggers(self, trigger_list: List[str] = None, MET_Filter: List[str] = None):
+    def apply_global_filters(self, triggers: List[str] = [], met_filters: List[str] = []):
         """
-        Filters events if ANY of the triggers in the list fired.
+        Applies Triggers (OR logic) and MET Filters (AND logic) if provided.
         """
-        if not trigger_list:
-            print("NO Triggers are applied")
-            return self
+        # 1. Apply Triggers (OR)
+        if triggers:
+            self.df = self.df.Filter(" || ".join(triggers), "Combined Trigger Cut")
+            print(f"Applied {len(triggers)} Triggers")
 
-        if not MET_Filter:
-            print("NO MET Filters are applied")
-            return self
+        # 2. Apply MET Filters (AND)
+        if met_filters:
+            self.df = self.df.Filter(" && ".join(met_filters), "Combined MET Cut")
+            print(f"Applied {len(met_filters)} MET Filters")
 
-
-        # Join all triggers with "||" (OR operator)
-        trigger_logic = " || ".join(trigger_list)
-        print(f"Applying Trigger Logic: {trigger_logic}")
-
-        # Join all MET Filters with "&&" (AND operator)
-        MET_logic = " && ".join(MET_Filter)
-        print(f"Applying MET Filters: {MET_logic}")
-
-        
-        self.df = self.df.Filter(trigger_logic, "Combined Trigger Cut")
-        self.df = self.df.Filter(MET_logic, "Combined MET Cut")
         return self
 
     def define_good_electrons(self):
@@ -78,19 +68,4 @@ class AnalysisSkimmer:
         print("\n--- Cut Flow Report ---")
         report.Print()
 
-# --- MAIN ---
-if __name__ == "__main__":
-    # Create Skimmer
-    skimmer = AnalysisSkimmer("/uscms/home/msahoo/nobackup/Project_tzq/2022Data_Muon.root", "Events")
 
-    # 1. Apply Multiple Triggers
-    triggers = ["HLT_IsoMu24", "HLT_Ele32_WPTight_Gsf"]
-    #MET = [
-    skimmer.apply_multiple_triggers(triggers)
-
-    # 2. Select Objects
-    skimmer.define_good_electrons()
-    skimmer.define_good_muons()
-
-    # 3. Save
-    skimmer.save_snapshot("output_multi_trigger.root", extra_branches=["MET_pt"])
