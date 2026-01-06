@@ -16,4 +16,4 @@
 .vscode/
 *.sw*
 .nfs*
-input_files.txt
+*.txt
