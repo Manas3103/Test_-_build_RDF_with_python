@@ -55,12 +55,12 @@ class AnalysisSkimmer:
         self.book_monitor_histos(self.df, "Step2_MetFilters")
 
         #3. Apply additional cuts
-        self.df = self.df.Filter("PV_npvsGood > 0", "Has Good PV")
+        self.df = self.df.Filter("PV_npvsGood > 0 && nJet>0", "Has Good PV")
         self.book_monitor_histos(self.df, "Step3_GoodPV")
         self.df = self.df.Filter("nJet>0", "Atleast one Jet is required")
-        self.book_monitor_histos(self.df, "Step4_nJet>0")
+        #self.book_monitor_histos(self.df, "Step4_nJet>0")
         self.df = self.df.Filter("nMuon + nElectron >= 3" , "Only allowed 3 Leptons")
-        self.book_monitor_histos(self.df, "Step5_More_than_3Lepton")
+        #self.book_monitor_histos(self.df, "Step5_More_than_3Lepton")
         print("3 Lepton >1 jet and the GOOD_PV cut is applied")
 
         return self.df
@@ -69,23 +69,28 @@ class AnalysisSkimmer:
         print(f"Defining Good Electrons")
         
         # Define mask and new branches
-        self.df = self.df.Define("good_ele_mask", 
-                                 f"Electron_pt >15 && abs(Electron_eta) < 2.4")
+        self.df = self.df.Define("good_ele_mask","Electron_pt >15 && abs(Electron_eta) < 2.4 && Electron_cutBased == 4")
+        self.df = self.df.Define("tight_ele_mask","Electron_pt >15 && abs(Electron_eta) < 2.4 && Electron_cutBased == 4 && Electron_mvaTTH > 0.90")
         
         # Create the new filtered branches
         self.df = self.df.Define("GoodElectron_pt", "Electron_pt[good_ele_mask]")
         self.df = self.df.Define("GoodElectron_eta", "Electron_eta[good_ele_mask]")
         self.df = self.df.Define("nGoodElectron", "Sum(good_ele_mask)")
+
+        self.df = self.df.Define("TightElectron_pt", "Electron_pt[tight_ele_mask]")
+        self.df = self.df.Define("TightElectron_eta", "Electron_eta[tight_ele_mask]")
+        self.df = self.df.Define("nTightElectron", "Sum(tight_ele_mask)")
+
         
         # Add to save list
-        self.output_branches.extend(["GoodElectron_pt", "GoodElectron_eta","nGoodElectron"])
+        self.output_branches.extend(["GoodElectron_pt", "GoodElectron_eta","nGoodElectron","TightElectron_pt","TightElectron_eta","nTightElectron" ])
         return self
 
     def define_good_muons(self):
         print(f"Defining Good Muons)")
         
         self.df = self.df.Define("good_mu_mask", 
-                                 f"Muon_pt > 15 && abs(Muon_eta) < 2.4")
+                                 "Muon_pt > 15 && abs(Muon_eta) < 2.4")
         
         self.df = self.df.Define("GoodMuon_pt", "Muon_pt[good_mu_mask]")
         self.df = self.df.Define("GoodMuon_eta", "Muon_eta[good_mu_mask]")

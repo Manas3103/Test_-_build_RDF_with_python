@@ -2,27 +2,28 @@ from skimmer import AnalysisSkimmer
 
 def main():
     # --- Configuration ---
-    INPUT_FILE = "/uscms/home/msahoo/nobackup/Project_tzq/2022Data_Muon.root"  # Change this to your file path
+    #INPUT_FILE = "/uscms/home/msahoo/nobackup/Project_tzq/merged.root" # Change this to your file path
+    INPUT_FILE = "root://cmsxrootd.fnal.gov//store/data/Run2022D/MuonEG/NANOAOD/22Sep2023-v1/40000/a74255fa-4b70-4ef0-9d47-1ee2651ac525.root"
     OUTPUT_FILE = "output_filtered.root"
     TREE_NAME = "Events"
 
     # Define Triggers (OR Logic)
     # Events passing ANY of these will be kept
     TRIGGERS = [
-        "HLT_IsoMu24",
+        "HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL",
         "HLT_Ele32_WPTight_Gsf",
-        "HLT_Mu50"
+        "HLT_Ele16_Ele12_Ele8_CaloIdL_TrackIdL"
     ]
 
     # Define MET Filters (AND Logic)
     # Events must pass ALL of these to be kept
     MET_FILTERS = [
         "Flag_goodVertices",
-        "Flag_globalSuperTightHalo2016Filter",
         "Flag_HBHENoiseFilter",
         "Flag_HBHENoiseIsoFilter",
         "Flag_EcalDeadCellTriggerPrimitiveFilter",
         "Flag_BadPFMuonFilter",
+        "Flag_BadPFMuonDzFilter",
         "Flag_eeBadScFilter"
     ]
 
